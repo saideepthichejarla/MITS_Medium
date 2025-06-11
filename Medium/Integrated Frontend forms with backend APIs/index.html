@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MITS Team Portal - Login and Secure Forms</title>
+<style>
+  /* Reset and basics */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    background: #f9fafb;
+    font-family: 'Inter', sans-serif;
+    color: #374151;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  a {
+    color: #2563eb;
+    text-decoration: none;
+  }
+  a:hover, a:focus {
+    text-decoration: underline;
+  }
+
+  /* Container */
+  .container {
+    max-width: 1000px;
+    width: 100%;
+    padding: 48px 24px 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+  }
+
+  /* Header */
+  header {
+    position: sticky;
+    top: 0;
+    background: #4338ca; /* deep indigo */
+    border-bottom: 1px solid #6d28d9;
+    padding: 24px 32px;
+    width: 100%;
+    color: #f9fafb;
+    font-weight: 700;
+    font-size: 1.75rem;
+    display: flex;
+    justify-content: center;
+    user-select: none;
+    z-index: 1000;
+  }
+  header small {
+    font-weight: 400;
+    font-size: 0.9rem;
+    margin-left: 8px;
+    color: rgba(249, 250, 251, 0.7);
+  }
+
+  /* Card style */
+  .card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 36px 40px;
+    box-shadow: 0 10px 24px rgb(67 56 202 / 0.12);
+    width: 100%;
+    max-width: 460px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .card h2 {
+    font-weight: 700;
+    font-size: 1.9rem;
+    color: #1e293b;
+    margin: 0;
+    user-select: none;
+    text-align: center;
+  }
+  .description {
+    font-size: 1rem;
+    color: #475569;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  /* Form controls */
+  label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #334155;
+    margin-bottom: 6px;
+    user-select: none;
+  }
+  input[type="email"],
+  input[type="password"],
+  input[type="text"] {
+    width: 100%;
+    font-size: 1rem;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1.5px solid #cbd5e1;
+    color: #1e293b;
+    background: #f8fafc;
+    transition: border-color 0.3s ease;
+    font-family: 'Inter', sans-serif;
+  }
+  input[type="email"]:focus,
+  input[type="password"]:focus,
+  input[type="text"]:focus {
+    outline: none;
+    border-color: #4338ca;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.4);
+    background: #ffffff;
+  }
+
+  /* Buttons */
+  button {
+    cursor: pointer;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    user-select: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  button:disabled {
+    background: #a5b4fc;
+    cursor: not-allowed;
+  }
+  button.primary {
+    background: #4338ca;
+    color: white;
+  }
+  button.primary:hover:not(:disabled),
+  button.primary:focus:not(:disabled) {
+    background: #3730a3;
+    outline: none;
+    transform: scale(1.05);
+  }
+  button.secondary {
+    background: transparent;
+    color: #4338ca;
+    border: 2px solid #4338ca;
+  }
+  button.secondary:hover:not(:disabled),
+  button.secondary:focus:not(:disabled) {
+    background: #4338ca;
+    color: white;
+    outline: none;
+    transform: scale(1.05);
+  }
+
+  /* Spinner */
+  .spinner {
+    border: 3px solid transparent;
+    border-top: 3px solid #ffffff;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Messages */
+  .message {
+    font-weight: 600;
+    font-size: 1rem;
+    text-align: center;
+    min-height: 1.3em;
+    user-select: none;
+  }
+  .message.success {
+    color: #16a34a;
+  }
+  .message.error {
+    color: #dc2626;
+  }
+
+  /* Protected section wraps the forms */
+  #protected-section {
+    width: 100%;
+    max-width: 1024px;
+    display: none;
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
+  }
+
+  /* Forms container */
+  .forms-wrapper {
+    display: grid;
+    gap: 48px;
+    width: 100%;
+  }
+  @media(min-width: 1024px) {
+    .forms-wrapper {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* Material Icons import */
+  @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
+
+  .material-icons-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 20px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    direction: ltr;
+    user-select: none;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Logout button container */
+  #logout-container {
+    width: 100%;
+    max-width: 460px;
+    display: flex;
+    justify-content: flex-end;
+  }
+</style>
+</head>
+<body>
+<header>
+  MITS Team Portal <small>Secure Access</small>
+</header>
+
+<main class="container">
+  <!-- Login Card -->
+  <section id="login-section" class="card" aria-label="User Login Form">
+    <h2>Login</h2>
+    <p class="description">Enter your credentials to access internship applications and offer letter generation.</p>
+    <form id="login-form" novalidate>
+      <label for="email">Email Address</label>
+      <input type="email" id="email" name="email" placeholder="user@example.com" autocomplete="email" required aria-required="true" />
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required aria-required="true" />
+      <button type="submit" class="primary" aria-live="polite">
+        <span class="button-text">Login</span>
+      </button>
+    </form>
+    <div role="alert" aria-live="assertive" id="login-message" class="message" style="min-height:1.25em;"></div>
+  </section>
+
+  <!-- Protected Section - forms and logout -->
+  <section id="protected-section" aria-live="polite">
+    <div id="logout-container">
+      <button id="btn-logout" class="secondary" aria-label="Logout">
+        <span class="material-icons-outlined" aria-hidden="true" style="font-size:24px;">logout</span> Logout
+      </button>
+    </div>
+    <section class="forms-wrapper">
+      <!-- Internship Application Form -->
+      <form id="internship-form" class="card" aria-labelledby="internship-title" novalidate>
+        <h2 id="internship-title">Internship Application</h2>
+        <p class="description">Apply for internship opportunities by submitting your details below.</p>
+
+        <label for="applicant-name">Full Name *</label>
+        <input id="applicant-name" name="name" type="text" required aria-required="true" placeholder="John Doe" autocomplete="name" />
+
+        <label for="applicant-phone">Phone Number</label>
+        <input id="applicant-phone" name="phone" type="text" placeholder="+1 555 123 4567" autocomplete="tel" />
+
+        <label for="applicant-degree">Degree Program *</label>
+        <select id="applicant-degree" name="degree" required aria-required="true">
+          <option value="" disabled selected>Select your degree program</option>
+          <option value="bachelor">Bachelor's</option>
+          <option value="master">Master's</option>
+          <option value="phd">PhD</option>
+          <option value="other">Other</option>
+        </select>
+
+        <label for="applicant-start-date">Available Start Date *</label>
+        <input id="applicant-start-date" name="startDate" type="date" required aria-required="true" />
+
+        <label for="applicant-message">Additional Message</label>
+        <textarea id="applicant-message" name="message" placeholder="Tell us why you are a good fit..." rows="4"></textarea>
+
+        <button type="submit" class="primary" aria-live="polite">
+          <span class="button-text">Submit Application</span>
+        </button>
+
+        <div role="alert" aria-live="assertive" class="message" id="internship-message" style="min-height:1.25em;"></div>
+      </form>
+
+      <!-- Offer Letter Generation Form -->
+      <form id="offerletter-form" class="card" aria-labelledby="offerletter-title" novalidate>
+        <h2 id="offerletter-title">Offer Letter Generation</h2>
+        <p class="description">Generate an offer letter by providing the relevant details below.</p>
+
+        <label for="candidate-name">Candidate Name *</label>
+        <input id="candidate-name" name="candidateName" type="text" required aria-required="true" placeholder="Jane Smith" autocomplete="name" />
+
+        <label for="candidate-position">Position Offered *</label>
+        <input id="candidate-position" name="position" type="text" required aria-required="true" placeholder="Software Engineer" />
+
+        <label for="candidate-start-date">Start Date *</label>
+        <input id="candidate-start-date" name="startDate" type="date" required aria-required="true" />
+
+        <label for="candidate-salary">Salary (USD)</label>
+        <input id="candidate-salary" name="salary" type="text" placeholder="50,000" pattern="^[0-9,]+$" inputmode="numeric" />
+
+        <button type="submit" class="primary" aria-live="polite">
+          <span class="button-text">Generate Offer Letter</span>
+        </button>
+
+        <div role="alert" aria-live="assertive" class="message" id="offerletter-message" style="min-height:1.25em;"></div>
+      </form>
+    </section>
+  </section>
+</main>
+
+<footer style="background:#4338ca; color:#e0e7ff; padding: 24px; text-align:center; font-size:0.875rem; user-select:none; width:100%;">
+  &copy; 2024 MITS Team Portal
+</footer>
+
+<script>
+  // Utility functions
+  function setLoading(button, isLoading, defaultText) {
+    if (isLoading) {
+      button.disabled = true;
+      button.innerHTML = '<span class="spinner" aria-hidden="true"></span><span class="sr-only">Loading...</span>';
+    } else {
+      button.disabled = false;
+      button.innerHTML = '<span class="button-text">' + defaultText + '</span>';
+    }
+  }
+
+  function saveToken(token) {
+    localStorage.setItem('mitsAuthToken', token);
+  }
+  function getToken() {
+    return localStorage.getItem('mitsAuthToken');
+  }
+  function clearToken() {
+    localStorage.removeItem('mitsAuthToken');
+  }
+
+  // Manage authentication state and UI accordingly
+  const loginSection = document.getElementById('login-section');
+  const protectedSection = document.getElementById('protected-section');
+  const loginMessage = document.getElementById('login-message');
+  const loginForm = document.getElementById('login-form');
+  const logoutButton = document.getElementById('btn-logout');
+
+  function updateUIForAuth(isAuthenticated) {
+    if (isAuthenticated) {
+      loginSection.style.display = 'none';
+      protectedSection.style.display = 'flex';
+    } else {
+      loginSection.style.display = 'block';
+      protectedSection.style.display = 'none';
+    }
+  }
+
+  // On page load check token
+  document.addEventListener('DOMContentLoaded', () => {
+    const token = getToken();
+    updateUIForAuth(!!token);
+  });
+
+  // Login form submit handler
+  loginForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    loginMessage.textContent = '';
+    const submitButton = loginForm.querySelector('button[type="submit"]');
+    setLoading(submitButton, true, 'Login');
+
+    const formData = new FormData(loginForm);
+    const data = Object.fromEntries(formData.entries());
+
+    if (!data.email?.trim() || !data.password?.trim()) {
+      loginMessage.textContent = 'Please enter email and password.';
+      loginMessage.className = 'message error';
+      setLoading(submitButton, false, 'Login');
+      return;
+    }
+
+    // Simulate API call to /api/login
+    try {
+      // Replace below with actual API request - here simulating success
+      // Here's a fake response if email is "user@mits.edu" and password "password123"
+      await new Promise(r => setTimeout(r, 1200)); // simulate network delay
+
+      if (data.email.toLowerCase() === 'user@mits.edu' && data.password === 'password123') {
+        const fakeJwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.fakepayload.fakesignature';
+        saveToken(fakeJwt);
+        loginMessage.textContent = '';
+        updateUIForAuth(true);
+        loginForm.reset();
+      } else {
+        throw new Error('Invalid email or password');
+      }
+    } catch(error) {
+      loginMessage.textContent = 'Login failed: ' + error.message;
+      loginMessage.className = 'message error';
+      console.error('Login error:', error);
+    } finally {
+      setLoading(submitButton, false, 'Login');
+    }
+  });
+
+  // Logout button handler
+  logoutButton.addEventListener('click', () => {
+    clearToken();
+    updateUIForAuth(false);
+  });
+
+  // Below reusing forms from previous task, now only accessible when logged in
+
+  // Internship Application form submission
+  const internshipForm = document.getElementById('internship-form');
+  const internshipMessage = document.getElementById('internship-message');
+  internshipForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    internshipMessage.textContent = '';
+    const submitButton = internshipForm.querySelector('button[type="submit"]');
+    setLoading(submitButton, true, 'Submit Application');
+
+    const token = getToken();
+    if (!token) {
+      internshipMessage.textContent = 'You must be logged in to submit applications.';
+      internshipMessage.className = 'message error';
+      setLoading(submitButton, false, 'Submit Application');
+      return;
+    }
+
+    const formData = new FormData(internshipForm);
+    const data = Object.fromEntries(formData.entries());
+
+    if (!data.name?.trim() || !data.degree || !data.startDate) {
+      internshipMessage.textContent = 'Please fill out all required fields.';
+      internshipMessage.className = 'message error';
+      setLoading(submitButton, false, 'Submit Application');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/internship-apply', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) {
+        throw new Error('Server responded with status ' + response.status);
+      }
+      const result = await response.json();
+      internshipMessage.textContent = result.message || 'Application submitted successfully.';
+      internshipMessage.className = 'message success';
+      internshipForm.reset();
+    } catch (error) {
+      internshipMessage.textContent = 'Failed to submit application. Please try again later.';
+      internshipMessage.className = 'message error';
+      console.error('Internship application error:', error);
+    } finally {
+      setLoading(submitButton, false, 'Submit Application');
+    }
+  });
+
+  // Offer Letter Generation form submission
+  const offerForm = document.getElementById('offerletter-form');
+  const offerMessage = document.getElementById('offerletter-message');
+  offerForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    offerMessage.textContent = '';
+    const submitButton = offerForm.querySelector('button[type="submit"]');
+    setLoading(submitButton, true, 'Generate Offer Letter');
+
+    const token = getToken();
+    if (!token) {
+      offerMessage.textContent = 'You must be logged in to generate offer letters.';
+      offerMessage.className = 'message error';
+      setLoading(submitButton, false, 'Generate Offer Letter');
+      return;
+    }
+
+    const formData = new FormData(offerForm);
+    const data = Object.fromEntries(formData.entries());
+
+    if (!data.candidateName?.trim() || !data.position?.trim() || !data.startDate) {
+      offerMessage.textContent = 'Please fill out all required fields.';
+      offerMessage.className = 'message error';
+      setLoading(submitButton, false, 'Generate Offer Letter');
+      return;
+    }
+
+    if (data.salary && !/^[0-9,]+$/.test(data.salary)) {
+      offerMessage.textContent = 'Salary must be a valid number.';
+      offerMessage.className = 'message error';
+      setLoading(submitButton, false, 'Generate Offer Letter');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/generate-offer-letter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) {
+        throw new Error('Server responded with status ' + response.status);
+      }
+      const result = await response.json();
+      offerMessage.textContent = result.message || 'Offer letter generated successfully.';
+      offerMessage.className = 'message success';
+      offerForm.reset();
+    } catch (error) {
+      offerMessage.textContent = 'Failed to generate offer letter. Please try again later.';
+      offerMessage.className = 'message error';
+      console.error('Offer letter generation error:', error);
+    } finally {
+      setLoading(submitButton, false, 'Generate Offer Letter');
+    }
+  });
+
+  // Accessibility helper style for screen readers only
+  const srStyle = document.createElement('style');
+  srStyle.textContent = '.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; ' +
+    'margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }';
+  document.head.appendChild(srStyle);
+</script>
+</body>
+</html>
+

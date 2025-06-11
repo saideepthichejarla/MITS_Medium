@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Messaging Application - Internship & Offer Letter Forms</title>
+<style>
+  /* Reset and basics */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    background: #ffffff;
+    font-family: 'Inter', sans-serif;
+    color: #374151; /* neutral gray */
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  a {
+    color: #2563eb;
+    text-decoration: none;
+  }
+  a:hover, a:focus {
+    text-decoration: underline;
+  }
+
+  /* Container */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 16px 48px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+  }
+
+  /* Header */
+  header {
+    position: sticky;
+    top: 0;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 1000;
+  }
+  .logo {
+    font-weight: 700;
+    font-size: 1.75rem;
+    color: #111827;
+    user-select: none;
+  }
+  nav {
+    display: flex;
+    gap: 24px;
+  }
+  nav a {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #4b5563;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background-color 0.25s ease;
+  }
+  nav a:hover,
+  nav a:focus {
+    background: #e0e7ff;
+    color: #4338ca;
+    outline: none;
+  }
+
+  /* Forms container */
+  .forms-wrapper {
+    display: grid;
+    gap: 48px;
+  }
+
+  @media (min-width: 1024px) {
+    .forms-wrapper {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* Card style forms */
+  form.card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 32px 32px 40px;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 100%;
+  }
+
+  form.card h2 {
+    font-weight: 700;
+    font-size: 1.75rem;
+    color: #111827;
+    margin-bottom: 8px;
+  }
+  form.card p.description {
+    color: #6b7280;
+    font-size: 1rem;
+  }
+
+  /* Form controls */
+  label {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #374151;
+    margin-bottom: 6px;
+    user-select: none;
+  }
+  input[type="text"],
+  input[type="email"],
+  input[type="date"],
+  select,
+  textarea {
+    width: 100%;
+    font-size: 1rem;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1.5px solid #d1d5db;
+    color: #111827;
+    background: #f9fafb;
+    transition: border-color 0.3s ease;
+    font-family: 'Inter', sans-serif;
+    resize: vertical;
+    min-height: 40px;
+  }
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="date"]:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+    border-color: #4f46e5;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgb(99 102 241 / 0.5);
+  }
+  textarea {
+    min-height: 80px;
+  }
+
+  /* Button */
+  button.submit-btn {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    border: none;
+    font-weight: 700;
+    font-size: 1.125rem;
+    padding: 14px 28px;
+    color: #ffffff;
+    background: #4f46e5;
+    border-radius: 12px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    user-select: none;
+    min-width: 140px;
+  }
+  button.submit-btn:disabled {
+    background: #a5b4fc;
+    cursor: not-allowed;
+  }
+  button.submit-btn:hover:not(:disabled),
+  button.submit-btn:focus:not(:disabled) {
+    background: #4338ca;
+    outline: none;
+    transform: scale(1.05);
+  }
+
+  /* Spinner */
+  .spinner {
+    border: 3px solid transparent;
+    border-top: 3px solid #ffffff;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Messages */
+  .message {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .message.success {
+    color: #16a34a;
+  }
+  .message.error {
+    color: #dc2626;
+  }
+
+  /* Material Icons import */
+  @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
+
+  .material-icons-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 20px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    direction: ltr;
+    user-select: none;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+  }
+
+</style>
+</head>
+<body>
+<header>
+  <div class="logo" aria-label="Messaging App Logo">MsgApp</div>
+  <nav role="navigation" aria-label="Primary navigation">
+    <a href="#internship-form">Internship Application</a>
+    <a href="#offerletter-form">Offer Letter Generation</a>
+  </nav>
+</header>
+
+<main class="container">
+  <section class="forms-wrapper">
+    <!-- Internship Application Form -->
+    <form id="internship-form" class="card" aria-labelledby="internship-title" novalidate>
+      <h2 id="internship-title">Internship Application</h2>
+      <p class="description">Apply for internship opportunities by submitting your details below.</p>
+
+      <label for="applicant-name">Full Name *</label>
+      <input id="applicant-name" name="name" type="text" required aria-required="true" placeholder="John Doe" autocomplete="name" />
+
+      <label for="applicant-email">Email Address *</label>
+      <input id="applicant-email" name="email" type="email" required aria-required="true" placeholder="john.doe@example.com" autocomplete="email" />
+
+      <label for="applicant-phone">Phone Number</label>
+      <input id="applicant-phone" name="phone" type="text" placeholder="+1 555 123 4567" autocomplete="tel" />
+
+      <label for="applicant-degree">Degree Program *</label>
+      <select id="applicant-degree" name="degree" required aria-required="true">
+        <option value="" disabled selected>Select your degree program</option>
+        <option value="bachelor">Bachelor's</option>
+        <option value="master">Master's</option>
+        <option value="phd">PhD</option>
+        <option value="other">Other</option>
+      </select>
+
+      <label for="applicant-start-date">Available Start Date *</label>
+      <input id="applicant-start-date" name="startDate" type="date" required aria-required="true" />
+
+      <label for="applicant-message">Additional Message</label>
+      <textarea id="applicant-message" name="message" placeholder="Tell us why you are a good fit..."></textarea>
+
+      <button type="submit" class="submit-btn" aria-live="polite">
+        <span class="button-text">Submit Application</span>
+      </button>
+
+      <div role="alert" aria-live="assertive" class="message" id="internship-message" style="min-height:1.25em;"></div>
+    </form>
+
+    <!-- Offer Letter Generation Form -->
+    <form id="offerletter-form" class="card" aria-labelledby="offerletter-title" novalidate>
+      <h2 id="offerletter-title">Offer Letter Generation</h2>
+      <p class="description">Generate an offer letter by providing the relevant details below.</p>
+
+      <label for="candidate-name">Candidate Name *</label>
+      <input id="candidate-name" name="candidateName" type="text" required aria-required="true" placeholder="Jane Smith" autocomplete="name" />
+
+      <label for="candidate-position">Position Offered *</label>
+      <input id="candidate-position" name="position" type="text" required aria-required="true" placeholder="Software Engineer" />
+
+      <label for="candidate-start-date">Start Date *</label>
+      <input id="candidate-start-date" name="startDate" type="date" required aria-required="true" />
+
+      <label for="candidate-salary">Salary (USD)</label>
+      <input id="candidate-salary" name="salary" type="text" placeholder="50,000" pattern="^[0-9,]+$" inputmode="numeric" />
+
+      <button type="submit" class="submit-btn" aria-live="polite">
+        <span class="button-text">Generate Offer Letter</span>
+      </button>
+
+      <div role="alert" aria-live="assertive" class="message" id="offerletter-message" style="min-height:1.25em;"></div>
+    </form>
+  </section>
+</main>
+
+<footer style="background:#f3f4f6; padding: 24px; text-align:center; font-size:0.875rem; color:#6b7280;">
+  &copy; 2024 MsgApp. All rights reserved.
+</footer>
+
+<script>
+  // Utility function to show spinner and text in button
+  function setLoading(button, isLoading, defaultText) {
+    if (isLoading) {
+      button.disabled = true;
+      button.innerHTML = '<span class="spinner" aria-hidden="true"></span><span class="sr-only">Loading...</span>';
+    } else {
+      button.disabled = false;
+      button.innerHTML = '<span class="button-text">' + defaultText + '</span>';
+    }
+  }
+
+  // Handle Internship Application form submission
+  const internshipForm = document.getElementById('internship-form');
+  const internshipMessage = document.getElementById('internship-message');
+  internshipForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    internshipMessage.textContent = '';
+    const submitButton = internshipForm.querySelector('button[type="submit"]');
+    setLoading(submitButton, true, 'Submit Application');
+
+    // Validate necessary fields manually for demo
+    const formData = new FormData(internshipForm);
+    const data = Object.fromEntries(formData.entries());
+
+    if (!data.name?.trim() || !data.email?.trim() || !data.degree || !data.startDate) {
+      internshipMessage.textContent = 'Please fill out all required fields.';
+      internshipMessage.className = 'message error';
+      setLoading(submitButton, false, 'Submit Application');
+      return;
+    }
+
+    // Simulate API call - replace with actual endpoint
+    try {
+      const response = await fetch('/api/internship-apply', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server responded with status ${response.status}`);
+      }
+      const result = await response.json();
+      internshipMessage.textContent = result.message || 'Application submitted successfully.';
+      internshipMessage.className = 'message success';
+      internshipForm.reset();
+    } catch (error) {
+      internshipMessage.textContent = 'Failed to submit application. Please try again later.';
+      internshipMessage.className = 'message error';
+      console.error('Internship application error:', error);
+    } finally {
+      setLoading(submitButton, false, 'Submit Application');
+    }
+  });
+
+  // Handle Offer Letter Generation form submission
+  const offerForm = document.getElementById('offerletter-form');
+  const offerMessage = document.getElementById('offerletter-message');
+  offerForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    offerMessage.textContent = '';
+    const submitButton = offerForm.querySelector('button[type="submit"]');
+    setLoading(submitButton, true, 'Generate Offer Letter');
+
+    const formData = new FormData(offerForm);
+    const data = Object.fromEntries(formData.entries());
+
+    // Validate required fields
+    if (!data.candidateName?.trim() || !data.position?.trim() || !data.startDate) {
+      offerMessage.textContent = 'Please fill out all required fields.';
+      offerMessage.className = 'message error';
+      setLoading(submitButton, false, 'Generate Offer Letter');
+      return;
+    }
+
+    // Validate salary input if provided
+    if (data.salary && !/^[0-9,]+$/.test(data.salary)) {
+      offerMessage.textContent = 'Salary must be a valid number.';
+      offerMessage.className = 'message error';
+      setLoading(submitButton, false, 'Generate Offer Letter');
+      return;
+    }
+
+    // Simulate API call - replace with actual endpoint
+    try {
+      const response = await fetch('/api/generate-offer-letter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server responded with status ${response.status}`);
+      }
+      const result = await response.json();
+      offerMessage.textContent = result.message || 'Offer letter generated successfully.';
+      offerMessage.className = 'message success';
+      offerForm.reset();
+    } catch (error) {
+      offerMessage.textContent = 'Failed to generate offer letter. Please try again later.';
+      offerMessage.className = 'message error';
+      console.error('Offer letter generation error:', error);
+    } finally {
+      setLoading(submitButton, false, 'Generate Offer Letter');
+    }
+  });
+
+  // Accessibility helper: hide spinner text from visual users but readable by screen readers
+  const style = document.createElement('style');
+  style.textContent = '.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; ' +
+    'margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }';
+  document.head.appendChild(style);
+
+</script>
+</body>
+</html>
+
